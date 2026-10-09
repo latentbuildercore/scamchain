@@ -31,9 +31,15 @@ interface MessageResultsProps {
   record: MessageInvestigationRecord;
   screenshotPreviewUrl?: string | null;
   onReset: () => void;
+  onInvestigateUrl?: (url: string) => void;
 }
 
-export function MessageResults({ record, screenshotPreviewUrl, onReset }: MessageResultsProps) {
+export function MessageResults({
+  record,
+  screenshotPreviewUrl,
+  onReset,
+  onInvestigateUrl,
+}: MessageResultsProps) {
   const [copied, setCopied] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -343,13 +349,24 @@ export function MessageResults({ record, screenshotPreviewUrl, onReset }: Messag
                   <span className="text-xs font-mono text-cyan-200 break-all select-all">
                     {link}
                   </span>
-                  <Link
-                    href={`/investigate?url=${encodeURIComponent(link)}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 text-xs font-mono font-medium transition-colors shrink-0 self-start sm:self-auto"
-                  >
-                    <span>{t.investigate.results.investigateLink || 'Investigate in Scanner'}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
+                  {onInvestigateUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => onInvestigateUrl(link)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 text-xs font-mono font-medium transition-colors shrink-0 self-start sm:self-auto cursor-pointer"
+                    >
+                      <span>{t.investigate.results.investigateLink || 'Investigate in Scanner'}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/investigate?url=${encodeURIComponent(link)}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 text-xs font-mono font-medium transition-colors shrink-0 self-start sm:self-auto"
+                    >
+                      <span>{t.investigate.results.investigateLink || 'Investigate in Scanner'}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>

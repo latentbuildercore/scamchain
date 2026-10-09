@@ -224,10 +224,15 @@ Output JSON Schema:
       ? Math.min(100, Math.max(0, parsed.confidence))
       : 75;
 
-    // Extract any URLs that might have been found by Gemini, plus regex validation
-    const modelUrls = Array.isArray(parsed.extractedUrls) ? (parsed.extractedUrls as string[]) : [];
+    // Extract any URLs found by Gemini, verifying each against raw message text to prevent hallucination
+    const rawModelUrls = Array.isArray(parsed.extractedUrls) ? (parsed.extractedUrls as string[]) : [];
+    const verifiedModelUrls = rawModelUrls.filter((u) => {
+      if (typeof u !== 'string') return false;
+      const stripped = u.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/.*$/, '');
+      return stripped.length > 0 && trimmed.toLowerCase().includes(stripped.toLowerCase());
+    });
     const regexUrls = extractUrlsFromText(trimmed);
-    const combinedUrls = Array.from(new Set([...modelUrls, ...regexUrls]));
+    const combinedUrls = Array.from(new Set([...regexUrls, ...verifiedModelUrls]));
 
     return {
       classification,

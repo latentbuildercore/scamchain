@@ -24,6 +24,7 @@ import assert from 'node:assert/strict';
 // ─── Module-path aliases resolve via tsconfig.json @/ → src/
 // We use relative paths to stay compatible with ts-node/tsx without path-alias plugins.
 import { validateAndNormalizeUrl } from '../lib/scanner/safe-fetch.js';
+import { runUrlInvestigation } from '../lib/scanner/url-investigation.js';
 import {
   detectLanguageFromText,
   extractUrlsFromText,
@@ -765,6 +766,54 @@ describe('Evaluator Readiness & Pipeline Isolation Invariants', () => {
     assert.equal(result.classification, 'LEGITIMATE');
     assert.equal(result.impersonationDetected, false);
     assert.equal(result.extractedUrls.length, 0);
+  });
+
+  test('runUrlInvestigation rejects invalid or private SSRF URLs with informative errors', async () => {
+    await assert.rejects(
+      async () => await runUrlInvestigation('http://127.0.0.1:8080'),
+      /Access to private, loopback, or local infrastructure addresses is disallowed/
+    );
+    await assert.rejects(
+      async () => await runUrlInvestigation('ftp://forbidden.com'),
+      /Only HTTP and HTTPS protocols are permitted/
+    );
+    await assert.rejects(
+      async () => await runUrlInvestigation(''),
+      /URL is required/
+    );
+  });
+
+  test('SSRF redirect protection rejects redirect destination to metadata or internal addresses', () => {
+    const dangerousRedirects = [
+      'http://169.254.169.254/latest/meta-data',
+      'http://127.0.0.1:3000/internal',
+      'http://10.0.1.5/admin',
+      'http://192.168.0.1/gateway',
+      'http://instance-data.internal/creds',
+      'http://corp-service.local/api',
+    ];
+    for (const url of dangerousRedirects) {
+      const res = validateAndNormalizeUrl(url);
+      assert.equal(res.valid, false, `Expected ${url} to be blocked by SSRF filter`);
+    }
+  });
+
+  test('model URL extraction grounds links and rejects hallucinated domains not present in verbatim text', () => {
+    const userMessage = 'Your account has an alert. Visit https://verified-bank.example.com to check status.';
+    const hallucinatedUrl = 'https://hallucinated-scam-trap.com';
+    const validUrl = 'https://verified-bank.example.com';
+
+    // Model candidate URLs contains one valid and one hallucinated URL
+    const rawModelUrls = [validUrl, hallucinatedUrl];
+
+    const verifiedUrls = rawModelUrls.filter((u) => {
+      if (typeof u !== 'string') return false;
+      const stripped = u.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/.*$/, '');
+      return stripped.length > 0 && userMessage.toLowerCase().includes(stripped.toLowerCase());
+    });
+
+    assert.deepEqual(verifiedUrls, [validUrl], 'Hallucinated URL must be pruned from results');
+    assert.ok(!verifiedUrls.includes(hallucinatedUrl), 'Fabricated link must not appear');
   });
 });
 

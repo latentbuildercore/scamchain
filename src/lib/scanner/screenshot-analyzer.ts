@@ -1,5 +1,5 @@
 import { MessageInvestigationResult, MessageThreatClassification } from '@/types';
-import { detectLanguageFromText } from './message-analyzer';
+import { detectLanguageFromText, extractUrlsFromText } from './message-analyzer';
 
 /**
  * Analyzes a screenshot of a suspicious message using Google Gemini multimodal capabilities.
@@ -179,13 +179,23 @@ Expected JSON format:
       ? parsed.detectedLanguage
       : (extractedText ? detectLanguageFromText(extractedText) : 'Unknown');
 
+    const rawModelUrls = Array.isArray(parsed.extractedUrls) ? (parsed.extractedUrls as string[]) : [];
+    const regexUrls = extractedText ? extractUrlsFromText(extractedText) : [];
+    const verifiedModelUrls = rawModelUrls.filter((u) => {
+      if (typeof u !== 'string') return false;
+      if (!extractedText) return true;
+      const stripped = u.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/.*$/, '');
+      return stripped.length === 0 || extractedText.toLowerCase().includes(stripped.toLowerCase());
+    });
+    const combinedUrls = Array.from(new Set([...regexUrls, ...verifiedModelUrls]));
+
     return {
       classification,
       confidence,
       extractedText,
       detectedLanguage,
       explanationInDetectedLanguage: typeof parsed.explanationInDetectedLanguage === 'string' ? parsed.explanationInDetectedLanguage : undefined,
-      extractedUrls: Array.isArray(parsed.extractedUrls) ? (parsed.extractedUrls as string[]) : [],
+      extractedUrls: combinedUrls,
       findings: Array.isArray(parsed.findings) ? (parsed.findings as string[]) : [],
       riskFactors: Array.isArray(parsed.riskFactors) ? (parsed.riskFactors as string[]) : [],
       possibleHumorOrJoke: Boolean(parsed.possibleHumorOrJoke),

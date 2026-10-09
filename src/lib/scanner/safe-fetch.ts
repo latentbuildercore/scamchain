@@ -116,6 +116,21 @@ export async function collectObservableSignals(targetUrl: string): Promise<Obser
     clearTimeout(timeout);
 
     const finalUrl = response.url || targetUrl;
+
+    // SSRF Redirect Protection: Ensure the final destination is not a private, loopback, or metadata address
+    if (finalUrl !== targetUrl) {
+      const redirectValidation = validateAndNormalizeUrl(finalUrl);
+      if (!redirectValidation.valid) {
+        return {
+          ...defaultSignals,
+          httpStatus: `${response.status} (Disallowed Redirect)`,
+          statusText: 'Redirect to private or disallowed address blocked',
+          finalUrl: targetUrl,
+          visibleTextSnippet: `Redirect blocked: ${redirectValidation.error || 'Destination address is disallowed'}`,
+        };
+      }
+    }
+
     const finalHost = new URL(finalUrl).hostname;
     const isRedirected = finalUrl !== targetUrl;
 

@@ -379,6 +379,13 @@ export function InvestigationForm() {
         record={messageResult}
         screenshotPreviewUrl={screenshotPreview}
         onReset={handleReset}
+        onInvestigateUrl={(targetUrl) => {
+          setMessageResult(null);
+          setInvestigationResult(null);
+          setMode('url');
+          setUrl(targetUrl);
+          setErrorMessage(null);
+        }}
       />
     );
   }

@@ -15,7 +15,8 @@ Rather than producing a single opaque suspicion score, SCAMCHAIN safely collects
 ## 🚀 Supported Investigation Modes
 
 1. **Website / URL Investigation (`POST /api/investigate`)**:
-   - Validates URL syntax and enforces strict SSRF protections (blocking loopback, private RFC1918/RFC6598 ranges, AWS/GCP metadata endpoints).
+   - Validates URL syntax and enforces strict SSRF protections (blocking loopback, private RFC1918/RFC6598 ranges, AWS/GCP metadata endpoints, and validating redirect destinations to eliminate 3xx SSRF).
+   - Powered by a unified `runUrlInvestigation` engine (`src/lib/scanner/url-investigation.ts`) shared across all analysis entry points.
    - Conducts passive, read-only signal collection (DNS, TLS, HTTP response headers, redirect chains, external domains).
    - Synthesizes findings via Google Gemini (`gemini-2.0-flash`) with deterministic offline heuristic fallback.
    - Computes Website DNA and matches technical indicators against threat campaigns.
@@ -93,7 +94,7 @@ npm install
 ```bash
 npm test
 ```
-Executes 59 automated test cases covering SSRF protection, language detection, heuristic analysis, campaign correlation, report integrity, upload validation, and pipeline isolation.
+Executes 63 automated test cases covering SSRF protection, redirect defense, language detection, heuristic analysis, campaign correlation, report integrity, upload validation, pipeline isolation, and model URL grounding.
 
 ### 3. Type Checking
 ```bash

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeTextMessage } from '@/lib/scanner/message-analyzer';
-import { validateAndNormalizeUrl, collectObservableSignals } from '@/lib/scanner/safe-fetch';
-import { checkGoogleSafeBrowsing } from '@/lib/scanner/safe-browsing';
-import { analyzeWithGemini } from '@/lib/scanner/gemini-analyzer';
-import { generateWebsiteDNA } from '@/lib/scanner/website-dna';
-import { correlateWithCampaigns } from '@/lib/scanner/correlator';
-import { saveInvestigation } from '@/lib/data/investigation-store';
+import { runUrlInvestigation } from '@/lib/scanner/url-investigation';
 import { InvestigationRecord, MessageInvestigationRecord } from '@/types';
 
 const MAX_MESSAGE_LENGTH = 5000;
@@ -68,45 +63,12 @@ async function processTextMessage(message: string, context?: string, shouldCorre
 
   if (shouldCorrelate && messageAnalysis.extractedUrls && messageAnalysis.extractedUrls.length > 0) {
     const candidateUrl = messageAnalysis.extractedUrls[0];
-    const validation = validateAndNormalizeUrl(candidateUrl);
-
-    if (validation.valid && validation.normalizedUrl) {
-      try {
-        const normalizedUrl = validation.normalizedUrl;
-        const observedSignals = await collectObservableSignals(normalizedUrl);
-        const threatIntelligence = await checkGoogleSafeBrowsing(normalizedUrl);
-        const geminiAnalysis = await analyzeWithGemini(observedSignals, context);
-        const websiteDNA = generateWebsiteDNA(observedSignals, geminiAnalysis);
-        const correlation = correlateWithCampaigns(observedSignals, geminiAnalysis, websiteDNA);
-
-        const urlRecordId = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        const urlRecord: InvestigationRecord = {
-          id: urlRecordId,
-          createdAt: new Date().toISOString(),
-          url: candidateUrl,
-          normalizedUrl,
-          contextText: 'Extracted from suspicious message text analysis',
-          classification: geminiAnalysis.classification,
-          confidence: geminiAnalysis.confidence,
-          observedSignals,
-          threatIntelligence,
-          geminiAnalysis,
-          websiteDNA,
-          campaignIds: correlation.campaignIds,
-          campaignRelationship: correlation.campaignRelationship,
-          campaignMatches: correlation.matches,
-          recommendations: geminiAnalysis.recommendedActions,
-          storageSource: 'local_fallback',
-        };
-
-        const saveResult = await saveInvestigation(urlRecord);
-        urlRecord.storageSource = saveResult.storageSource;
-        urlInvestigation = urlRecord;
-      } catch (urlErr) {
-        console.warn(
-          `[investigate-message] URL sub-investigation notice: ${urlErr instanceof Error ? urlErr.message : String(urlErr)}`
-        );
-      }
+    try {
+      urlInvestigation = await runUrlInvestigation(candidateUrl, 'Extracted from suspicious message text analysis');
+    } catch (urlErr) {
+      console.warn(
+        `[investigate-message] URL sub-investigation notice: ${urlErr instanceof Error ? urlErr.message : String(urlErr)}`
+      );
     }
   }
 
