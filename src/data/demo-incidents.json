@@ -1,0 +1,346 @@
+{
+  "summary": {
+    "syntheticIncidents": 27,
+    "syntheticCampaigns": 5,
+    "activeCampaigns": 2,
+    "emergingCampaigns": 1,
+    "monitoringCampaigns": 2,
+    "totalIndicatorsTracked": 38,
+    "lastSyncTimestamp": "2026-10-08T12:00:00Z"
+  },
+  "campaigns": [
+    {
+      "id": "camp-c17",
+      "code": "C-17",
+      "name": "Crypto Wallet Drainer Infrastructure",
+      "description": "Multi-chain Web3 permit drainer network utilizing cloned DEX interfaces and deceptive Web3Modal RPC interceptors.",
+      "status": "active",
+      "threatLevel": "critical",
+      "firstSeen": "2026-09-14",
+      "lastActive": "2026-10-08",
+      "relatedIncidentsCount": 6,
+      "relatedDomainsCount": 3,
+      "sharedIndicatorsCount": 8,
+      "targetedBrands": ["MetaMask", "Uniswap", "Trust Wallet"],
+      "kitFingerprint": "Inferno-Permit2-v4.1",
+      "primaryVector": "sponsored_search",
+      "incidentIds": ["inc-101", "inc-102", "inc-103", "inc-104", "inc-105", "inc-106"],
+      "isSyntheticDemo": true,
+      "indicators": [
+        {
+          "id": "ind-01",
+          "category": "kit_fingerprint",
+          "name": "Drainer Obfuscation Signature",
+          "value": "eval(atob('ZXRoX3JlcXVlc3RBY2NvdW50cw...'))",
+          "confidence": 0.98,
+          "firstObserved": "2026-09-14",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 6,
+          "context": "Shared obfuscated wallet RPC proxy across 3 domains"
+        },
+        {
+          "id": "ind-02",
+          "category": "dns",
+          "name": "Bulletproof Nameserver",
+          "value": "ns1.host-offshore-shield.cc",
+          "confidence": 0.92,
+          "firstObserved": "2026-09-14",
+          "lastObserved": "2026-10-07",
+          "sharedCount": 3,
+          "context": "Nameserver cluster allocated in Seychelles ASN 49832"
+        },
+        {
+          "id": "ind-03",
+          "category": "telegram_c2",
+          "name": "Telegram Drop Bot ID",
+          "value": "bot7182930192:AAHg_DrainLogsDrop",
+          "confidence": 0.95,
+          "firstObserved": "2026-09-20",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 6,
+          "context": "Exfiltration endpoint embedded in client-side script"
+        },
+        {
+          "id": "ind-04",
+          "category": "ssl_certificate",
+          "name": "Free-Tier SSL Issuer Pattern",
+          "value": "Let's Encrypt R11 (90-day revolving)",
+          "confidence": 0.81,
+          "firstObserved": "2026-09-14",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 3,
+          "context": "Issued within 15 minutes of DNS record propagation"
+        }
+      ]
+    },
+    {
+      "id": "camp-c09",
+      "code": "C-09",
+      "name": "Banking Credential Harvester",
+      "description": "Emerging SMS smishing syndicate targeting retail banking 2FA tokens via real-time reverse proxy interception.",
+      "status": "emerging",
+      "threatLevel": "high",
+      "firstSeen": "2026-10-01",
+      "lastActive": "2026-10-08",
+      "relatedIncidentsCount": 3,
+      "relatedDomainsCount": 2,
+      "sharedIndicatorsCount": 5,
+      "targetedBrands": ["Chase", "Wells Fargo", "Bank of America"],
+      "kitFingerprint": "Modlishka-Fork-v2.9",
+      "primaryVector": "sms_phishing",
+      "incidentIds": ["inc-201", "inc-202", "inc-203"],
+      "isSyntheticDemo": true,
+      "indicators": [
+        {
+          "id": "ind-05",
+          "category": "html_structure",
+          "name": "Replicated Auth DOM Node",
+          "value": "div.logon-box-content-auth-wrapper-v2",
+          "confidence": 0.94,
+          "firstObserved": "2026-10-01",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 3,
+          "context": "Identical DOM structure cloned from Chase 2026 redesign"
+        },
+        {
+          "id": "ind-06",
+          "category": "redirect_chain",
+          "name": "Cloaking Redirect Gate",
+          "value": "check-bot-useragent.php?token=sec_",
+          "confidence": 0.89,
+          "firstObserved": "2026-10-02",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 2,
+          "context": "Filters automated security crawlers by mobile User-Agent"
+        }
+      ]
+    },
+    {
+      "id": "camp-c04",
+      "code": "C-04",
+      "name": "Gov Delivery SMS Phishing Network",
+      "description": "Long-running postal parcel fee scam campaign spoofing national post parcel tracking portals with deceptive payment forms.",
+      "status": "monitoring",
+      "threatLevel": "medium",
+      "firstSeen": "2026-08-10",
+      "lastActive": "2026-10-05",
+      "relatedIncidentsCount": 8,
+      "relatedDomainsCount": 4,
+      "sharedIndicatorsCount": 12,
+      "targetedBrands": ["USPS", "Royal Mail", "Canada Post"],
+      "kitFingerprint": "PostalFee-StripeStealer-v1.6",
+      "primaryVector": "sms_phishing",
+      "incidentIds": ["inc-301", "inc-302", "inc-303", "inc-304", "inc-305", "inc-306", "inc-307", "inc-308"],
+      "isSyntheticDemo": true,
+      "indicators": [
+        {
+          "id": "ind-07",
+          "category": "payment_gateway",
+          "name": "Rogue Payment Gateway Key",
+          "value": "pk_live_51NwY8bLK...synthetic",
+          "confidence": 0.96,
+          "firstObserved": "2026-08-10",
+          "lastObserved": "2026-10-05",
+          "sharedCount": 8,
+          "context": "Compromised Stripe merchant key collecting $1.99 'redelivery fees'"
+        },
+        {
+          "id": "ind-08",
+          "category": "dns",
+          "name": "Lookalike Subdomain Pattern",
+          "value": "track-usps-redelivery-notice.online",
+          "confidence": 0.91,
+          "firstObserved": "2026-08-15",
+          "lastObserved": "2026-10-05",
+          "sharedCount": 4,
+          "context": "Batch registered via Namecheap with PrivacyGuardian"
+        }
+      ]
+    },
+    {
+      "id": "camp-c22",
+      "code": "C-22",
+      "name": "Cloud Identity & SSO Phishing Cluster",
+      "description": "Adversary-in-the-Middle (AiTM) infrastructure targeting Microsoft 365 and Google Workspace corporate accounts.",
+      "status": "active",
+      "threatLevel": "critical",
+      "firstSeen": "2026-09-28",
+      "lastActive": "2026-10-08",
+      "relatedIncidentsCount": 6,
+      "relatedDomainsCount": 3,
+      "sharedIndicatorsCount": 7,
+      "targetedBrands": ["Microsoft 365", "Google Workspace", "Okta"],
+      "kitFingerprint": "EvilProxy-Enterprise-2026",
+      "primaryVector": "email_phishing",
+      "incidentIds": ["inc-401", "inc-402", "inc-403", "inc-404", "inc-405", "inc-406"],
+      "isSyntheticDemo": true,
+      "indicators": [
+        {
+          "id": "ind-09",
+          "category": "kit_fingerprint",
+          "name": "Session Cookie Exfiltration Bridge",
+          "value": "auth.sso-verify-corp.net/relay",
+          "confidence": 0.97,
+          "firstObserved": "2026-09-28",
+          "lastObserved": "2026-10-08",
+          "sharedCount": 6,
+          "context": "Captures session tokens bypassing FIDO2/MFA"
+        }
+      ]
+    },
+    {
+      "id": "camp-c31",
+      "code": "C-31",
+      "name": "Tech Support Screen Lock Loop",
+      "description": "Browser locker scam targeting elderly users through malicious sponsored advertising claiming infected Windows Defender systems.",
+      "status": "monitoring",
+      "threatLevel": "low",
+      "firstSeen": "2026-07-04",
+      "lastActive": "2026-09-30",
+      "relatedIncidentsCount": 4,
+      "relatedDomainsCount": 2,
+      "sharedIndicatorsCount": 6,
+      "targetedBrands": ["Microsoft Defender", "Apple Support"],
+      "kitFingerprint": "Browlock-AudioLoop-v3",
+      "primaryVector": "sponsored_search",
+      "incidentIds": ["inc-501", "inc-502", "inc-503", "inc-504"],
+      "isSyntheticDemo": true,
+      "indicators": [
+        {
+          "id": "ind-10",
+          "category": "html_structure",
+          "name": "Audio Alert Loop & Fullscreen Lock",
+          "value": "HTMLAudioElement('siren.mp3').play()",
+          "confidence": 0.88,
+          "firstObserved": "2026-07-04",
+          "lastObserved": "2026-09-30",
+          "sharedCount": 4,
+          "context": "Repeated fullscreen escape key trap"
+        }
+      ]
+    }
+  ],
+  "incidents": [
+    {
+      
+      "id": "inc-101",
+      "campaignId": "camp-c17",
+      "submittedUrl": "https://uniswap-v4-airdrop-claim.network",
+      "normalizedDomain": "uniswap-v4-airdrop-claim.network",
+      "reportedAt": "2026-10-07T14:22:10Z",
+      "victimVector": "sponsored_search",
+      "userNotes": "Fake Google Ad linking to fake Uniswap airdrop claiming 500 UNI tokens.",
+      "dna": {
+        "structuralHash": "sha256:4f8e3b219a9071cde",
+        "visualTheme": "Uniswap Interface Dark V3",
+        "kitSignature": "Inferno-Permit2-v4.1",
+        "registrar": "NameSilo LLC",
+        "nameservers": ["ns1.host-offshore-shield.cc", "ns2.host-offshore-shield.cc"],
+        "autonomousSystem": "AS49832 (Offshore Security Hosting)",
+        "extractedBrands": ["Uniswap", "Ethereum"],
+        "c2Endpoints": ["api.drain-telemetry.cc"]
+      },
+      "indicators": [],
+      "status": "correlated",
+      "similarityScore": 0.94,
+      "summary": "Impersonates Uniswap v4 airdrop portal with Permit2 signature drainer script.",
+      "isSyntheticDemo": true
+    },  
+    {
+      "id": "inc-102",
+      "campaignId": "camp-c17",
+      "submittedUrl": "https://metamask-security-reauth-node.xyz",
+      "normalizedDomain": "metamask-security-reauth-node.xyz",
+      "reportedAt": "2026-10-06T18:11:45Z",
+      "victimVector": "email_phishing",
+      "userNotes": "Phishing email warning about wallet suspension unless reverified.",
+      "dna": {
+        "structuralHash": "sha256:4f8e3b219a9071cde",
+        "visualTheme": "MetaMask Fox Login Portal",
+        "kitSignature": "Inferno-Permit2-v4.1",
+        "registrar": "NameSilo LLC",
+        "nameservers": ["ns1.host-offshore-shield.cc", "ns2.host-offshore-shield.cc"],
+        "autonomousSystem": "AS49832 (Offshore Security Hosting)",
+        "extractedBrands": ["MetaMask"],
+        "c2Endpoints": ["api.drain-telemetry.cc"]
+      },
+      "indicators": [],
+      "status": "correlated",
+      "similarityScore": 0.96,
+      "summary": "Targeted MetaMask secret recovery phrase stealer sharing C-17 hosting & C2 network.",
+      "isSyntheticDemo": true
+    },
+    {
+      "id": "inc-201",
+      "campaignId": "camp-c09",
+      "submittedUrl": "https://chase-urgent-verify-account.info",
+      "normalizedDomain": "chase-urgent-verify-account.info",
+      "reportedAt": "2026-10-08T08:14:02Z",
+      "victimVector": "sms_phishing",
+      "userNotes": "SMS arrived claiming account locked due to suspicious $489 transfer.",
+      "dna": {
+        "structuralHash": "sha256:91c0283a2ff83e710",
+        "visualTheme": "Chase Online Banking Mobile",
+        "kitSignature": "Modlishka-Fork-v2.9",
+        "registrar": "Tucows Domains Inc.",
+        "nameservers": ["ns1.cloudflare.com", "ns2.cloudflare.com"],
+        "autonomousSystem": "AS13335 (Cloudflare Proxy)",
+        "extractedBrands": ["Chase Bank"],
+        "c2Endpoints": ["relay.gatekeeper-chase.info"]
+      },
+      "indicators": [],
+      "status": "correlated",
+      "similarityScore": 0.91,
+      "summary": "AiTM credential harvesting node intercepting OTPs in real-time.",
+      "isSyntheticDemo": true
+    },
+    {
+      "id": "inc-301",
+      "campaignId": "camp-c04",
+      "submittedUrl": "https://usps-package-redelivery-fee.com",
+      "normalizedDomain": "usps-package-redelivery-fee.com",
+      "reportedAt": "2026-10-04T11:42:30Z",
+      "victimVector": "sms_phishing",
+      "userNotes": "SMS claiming parcel cannot be delivered without $1.99 address update fee.",
+      "dna": {
+        "structuralHash": "sha256:119ea5c77bd04ef12",
+        "visualTheme": "USPS Tracking and Postal Redelivery",
+        "kitSignature": "PostalFee-StripeStealer-v1.6",
+        "registrar": "Namecheap Inc.",
+        "nameservers": ["dns1.registrar-servers.com", "dns2.registrar-servers.com"],
+        "autonomousSystem": "AS22612 (Namecheap Hosting)",
+        "extractedBrands": ["USPS"],
+        "c2Endpoints": ["drop.usps-package-redelivery-fee.com"]
+      },
+      "indicators": [],
+      "status": "correlated",
+      "similarityScore": 0.88,
+      "summary": "Smishing landing page with cloned USPS tracking UI and payment form.",
+      "isSyntheticDemo": true
+    },
+    {
+      "id": "inc-demo-c17",
+      "campaignId": "camp-c17",
+      "submittedUrl": "https://uniswap-demo.invalid",
+      "normalizedDomain": "uniswap-demo.invalid",
+      "reportedAt": "2026-10-08T12:00:00Z",
+      "victimVector": "sponsored_search",
+      "userNotes": "Synthetic test fixture for campaign correlation.",
+      "dna": {
+        "structuralHash": "sha256:demo-c17",
+        "visualTheme": "Uniswap Interface Dark V3",
+        "kitSignature": "Inferno-Permit2-v4.1",
+        "registrar": "Synthetic",
+        "nameservers": ["ns1.synthetic.invalid"],
+        "autonomousSystem": "AS-DEMO",
+        "extractedBrands": ["Uniswap"],
+        "c2Endpoints": []
+      },
+      "indicators": [],
+      "status": "correlated",
+      "similarityScore": 0.9,
+      "summary": "Synthetic SCAMCHAIN campaign-correlation test fixture.",
+      "isSyntheticDemo": true
+    }
+  ]
+}
