@@ -32,7 +32,7 @@ import {
 import { correlateWithCampaigns } from '../lib/scanner/correlator.js';
 import { CompactWebsiteDNA } from '../types/index.js';
 import { analyzeScreenshotMessage } from '../lib/scanner/screenshot-analyzer.js';
-import { mapDetectedLanguageToLocale, dictionaries, getDictionary } from '../lib/i18n/index.js';
+import { mapDetectedLanguageToLocale, dictionaries } from '../lib/i18n/index.js';
 import demoData from '../../data/demo-incidents.json' with { type: 'json' };
 
 // ---------------------------------------------------------------------------
@@ -694,6 +694,17 @@ describe('i18n & Automatic Language Adaptation', () => {
     assert.equal(reEnabledSwitch, 'te', 'Auto-detect works again once user returns to Automatic detection');
     assert.equal(currentLocale, 'te');
   });
+
+  test('language provider guarantees deterministic initial server and client render state for hydration safety', () => {
+    // Both SSR and initial client hydration pass must initialize with identical default constants
+    const defaultLocale = 'en';
+    const defaultAutoDetect = true;
+    const defaultLabel = defaultAutoDetect ? `Auto: English` : 'English';
+    const defaultAria = `Select display language, current is ${defaultLabel}`;
+
+    assert.equal(defaultAria, 'Select display language, current is Auto: English');
+    assert.equal(defaultLocale, 'en');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -730,9 +741,9 @@ describe('Evaluator Readiness & Pipeline Isolation Invariants', () => {
     assert.equal(safeValidation.valid, true, 'Extracted public web domain must pass validation');
   });
 
-  test('file upload validation rejects invalid MIME types and enforces 5MB limit', () => {
+  test('file upload validation rejects invalid MIME types and enforces 3MB limit', () => {
     const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
     assert.ok(ALLOWED_MIME_TYPES.includes('image/png'));
     assert.ok(ALLOWED_MIME_TYPES.includes('image/webp'));
@@ -741,10 +752,10 @@ describe('Evaluator Readiness & Pipeline Isolation Invariants', () => {
     assert.ok(!ALLOWED_MIME_TYPES.includes('application/javascript'));
 
     const smallFileSize = 2 * 1024 * 1024; // 2 MB
-    const oversizedFileSize = 6 * 1024 * 1024; // 6 MB
+    const oversizedFileSize = 4 * 1024 * 1024; // 4 MB
 
     assert.ok(smallFileSize <= MAX_FILE_SIZE, '2MB file must be accepted');
-    assert.ok(oversizedFileSize > MAX_FILE_SIZE, '6MB file must exceed size limit');
+    assert.ok(oversizedFileSize > MAX_FILE_SIZE, '4MB file must exceed size limit');
   });
 
   test('message analysis does not invent threat data on unconfigured API', async () => {

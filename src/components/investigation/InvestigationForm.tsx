@@ -57,16 +57,20 @@ export function InvestigationForm() {
 
   const stageTimerRef = useRef<NodeJS.Timeout[]>([]);
 
-  // Check URL query parameters for prefilling on initial mount
+  // Check URL query parameters for prefilling on initial mount asynchronously
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlParam = params.get('url');
-      if (urlParam) {
-        setUrl(urlParam);
-        setMode('url');
+    const frameId = requestAnimationFrame(() => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const urlParam = params.get('url');
+        if (urlParam) {
+          setUrl(urlParam);
+          setMode('url');
+        }
       }
-    }
+    });
+
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   // Suggested website test targets
@@ -116,8 +120,8 @@ export function InvestigationForm() {
         setErrorMessage('Please select a valid image file (PNG, JPG, JPEG, WebP).');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage('Image file must be under 5 MB.');
+      if (file.size > 3 * 1024 * 1024) {
+        setErrorMessage('Image file must be under 3 MB.');
         return;
       }
       setScreenshot(file);
@@ -135,8 +139,8 @@ export function InvestigationForm() {
         setErrorMessage('Please select a valid image file (PNG, JPG, JPEG, WebP).');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage('Image file must be under 5 MB.');
+      if (file.size > 3 * 1024 * 1024) {
+        setErrorMessage('Image file must be under 3 MB.');
         return;
       }
       setScreenshot(file);

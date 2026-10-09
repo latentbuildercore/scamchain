@@ -597,7 +597,7 @@ export function InvestigationResults({ record, onReset }: InvestigationResultsPr
               <div className="flex items-center gap-2 text-[11px] text-slate-400">
                 <span>Storage Source:</span>
                 <span className="text-slate-300 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
-                  {record.storageSource === 'firestore' ? 'Cloud Firestore' : 'Local Development Cache'}
+                  {record.storageSource === 'firestore' ? 'Cloud Firestore (Durable)' : 'Ephemeral Session Cache (Non-durable)'}
                 </span>
               </div>
             </div>

@@ -28,7 +28,7 @@ Rather than producing a single opaque suspicion score, SCAMCHAIN safely collects
 
 3. **Screenshot Investigation (`POST /api/investigate-screenshot`)**:
    - Secure multimodal vision analysis using Gemini multimodal vision input.
-   - Enforces strict image validation (PNG, JPG, JPEG, WebP; maximum 5 MB).
+   - Enforces strict image validation (PNG, JPG, JPEG, WebP; maximum 3 MB).
    - Memory-only processing: uploaded screenshot buffers are **never** stored permanently on disk or in databases.
    - Extracts verbatim message text, assesses visual deception/impersonation, and extracts embedded URLs.
 

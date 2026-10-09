@@ -9,9 +9,9 @@ import { InvestigationRecord } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
-    let body: any;
+    let body: { url?: unknown; context?: unknown } | null = null;
     try {
-      body = await req.json();
+      body = (await req.json()) as { url?: unknown; context?: unknown };
     } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON request body.' },
@@ -19,14 +19,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { url, context } = body || {};
+    const rawUrl = body?.url;
+    const userContext =
+      typeof body?.context === 'string' && body.context.trim() ? body.context.trim() : undefined;
 
-    if (!url || typeof url !== 'string' || !url.trim()) {
+    if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
       return NextResponse.json(
         { success: false, error: 'A website URL is required.' },
         { status: 400 }
       );
     }
+
+    const url = rawUrl.trim();
 
     // 1. Validate & Normalize URL (reject non-http/https, SSRF IPs)
     const validation = validateAndNormalizeUrl(url);
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest) {
     const threatIntelligence = await checkGoogleSafeBrowsing(normalizedUrl);
 
     // 4. Gemini AI Threat Synthesis & Analysis
-    const geminiAnalysis = await analyzeWithGemini(observedSignals, context);
+    const geminiAnalysis = await analyzeWithGemini(observedSignals, userContext);
 
     // 5. Build Compact Deterministic Website DNA
     const websiteDNA = generateWebsiteDNA(observedSignals, geminiAnalysis);
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
       createdAt,
       url,
       normalizedUrl,
-      contextText: typeof context === 'string' && context.trim() ? context.trim() : undefined,
+      contextText: userContext,
       classification: geminiAnalysis.classification,
       confidence: geminiAnalysis.confidence,
       observedSignals,

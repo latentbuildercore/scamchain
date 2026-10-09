@@ -212,7 +212,6 @@ function generateHeuristicFallback(
 ): GeminiAnalysisResult {
   const host = signals.hostname.toLowerCase();
   const text = signals.visibleTextSnippet.toLowerCase();
-  const title = signals.pageTitle.toLowerCase();
   const suspiciousSignals: string[] = [];
   const benignSignals: string[] = [];
   const phishingIndicators: string[] = [];

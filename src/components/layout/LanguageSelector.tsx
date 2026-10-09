@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useSyncExternalStore } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { SupportedLocale } from '@/lib/i18n/types';
 import { Languages, Check, ChevronDown, Sparkles } from 'lucide-react';
+
+const noopSubscribe = () => () => {};
 
 export function LanguageSelector() {
   const {
@@ -16,6 +18,13 @@ export function LanguageSelector() {
   } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // useSyncExternalStore safely tracks client hydration without setState in effect
+  const isHydrated = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -39,8 +48,11 @@ export function LanguageSelector() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const currentMeta = supportedLocales[locale] || supportedLocales.en;
-  const currentLabel = isAutoDetectEnabled
+  // Hydration-safe guarantee: before client mount, strictly render deterministic SSR defaults
+  const effectiveAuto = isHydrated ? isAutoDetectEnabled : true;
+  const effectiveLocale = isHydrated ? locale : 'en';
+  const currentMeta = supportedLocales[effectiveLocale] || supportedLocales.en;
+  const currentLabel = effectiveAuto
     ? `Auto: ${currentMeta.nativeName}`
     : currentMeta.nativeName;
 
@@ -50,7 +62,7 @@ export function LanguageSelector() {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-mono transition-colors shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-          isAutoDetectEnabled
+          effectiveAuto
             ? 'border-cyan-800/80 bg-cyan-950/40 text-cyan-200 hover:bg-cyan-900/50'
             : 'border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700 hover:bg-slate-800/90'
         }`}
@@ -58,7 +70,7 @@ export function LanguageSelector() {
         aria-expanded={isOpen}
         aria-label={`Select display language, current is ${currentLabel}`}
       >
-        {isAutoDetectEnabled ? (
+        {effectiveAuto ? (
           <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
         ) : (
           <Languages className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -76,14 +88,14 @@ export function LanguageSelector() {
           {/* 1. Automatic Detection Option */}
           <button
             role="option"
-            aria-selected={isAutoDetectEnabled}
+            aria-selected={effectiveAuto}
             type="button"
             onClick={() => {
               enableAutoDetect();
               setIsOpen(false);
             }}
             className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer text-left ${
-              isAutoDetectEnabled
+              effectiveAuto
                 ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-800/80 font-bold'
                 : 'text-slate-300 hover:bg-slate-900 hover:text-slate-100'
             }`}
@@ -99,7 +111,7 @@ export function LanguageSelector() {
                 </span>
               </div>
             </div>
-            {isAutoDetectEnabled && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+            {effectiveAuto && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
           </button>
 
           <div className="my-1 border-t border-slate-800/80" />
@@ -107,7 +119,7 @@ export function LanguageSelector() {
           {/* 2. Specific Supported Languages */}
           <div className="space-y-0.5">
             {Object.values(supportedLocales).map((meta) => {
-              const isSelected = !isAutoDetectEnabled && meta.code === locale;
+              const isSelected = !effectiveAuto && meta.code === effectiveLocale;
               return (
                 <button
                   key={meta.code}

@@ -6,17 +6,9 @@ import {
   Printer,
   Download,
   X,
-  AlertTriangle,
-  ShieldAlert,
-  ShieldCheck,
-  HelpCircle,
-  ExternalLink,
-  Layers,
   FileText,
   Clock,
   Hash,
-  Globe,
-  Info,
 } from 'lucide-react';
 import { InvestigationRecord, MessageInvestigationRecord } from '@/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';

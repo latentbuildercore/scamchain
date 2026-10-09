@@ -12,8 +12,6 @@ import {
   Terminal,
   Sparkles,
   Info,
-  ExternalLink,
-  Filter,
   CheckCircle2,
   List,
   Network,
@@ -54,7 +52,6 @@ export function computeIncidentRelationship(
   const score = Math.min(100, Math.max(0, rawScore));
 
   // 1. Shared Brand Match
-  const incidentBrands = (incident.dna?.extractedBrands || []).map((b) => b.toLowerCase());
   const campaignBrands = (campaign.targetedBrands || []).map((b) => b.toLowerCase());
   const matchedBrands = incident.dna?.extractedBrands?.filter((b) =>
     campaignBrands.includes(b.toLowerCase())
@@ -138,7 +135,6 @@ export function CampaignDetailGraph({ campaign, incidents }: CampaignDetailGraph
   );
 
   const brands = campaign.targetedBrands || [];
-  const campaignIndicators = campaign.indicators || [];
   const incidentCount = incidents.length;
 
   // Extract infrastructure indicators from all linked incidents

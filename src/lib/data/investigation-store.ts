@@ -1,19 +1,19 @@
 import { InvestigationRecord } from '@/types';
+import { Firestore } from '@google-cloud/firestore';
 import fs from 'fs';
 import path from 'path';
 
-let firestoreInstance: any = null;
+let firestoreInstance: Firestore | null = null;
 let firestoreInitialized = false;
 
 // Initialize Firestore lazily if credentials/project are configured
-function getFirestore() {
+function getFirestore(): Firestore | null {
   if (firestoreInitialized) return firestoreInstance;
   firestoreInitialized = true;
 
   try {
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
-    if (projectId && projectId !== 'scamchain-hackathon-2026') {
-      const { Firestore } = require('@google-cloud/firestore');
+    if (projectId && projectId !== 'scamchain-hackathon-2026' && projectId.trim() !== '') {
       firestoreInstance = new Firestore({
         projectId,
         databaseId: process.env.FIRESTORE_DATABASE_ID || '(default)',
@@ -29,11 +29,21 @@ function getFirestore() {
   return firestoreInstance;
 }
 
-// In-memory fallback registry for development
+/**
+ * In-memory fallback registry for development and serverless runtimes.
+ *
+ * IMPORTANT VERCEL / SERVERLESS STORAGE NOTE:
+ * Serverless execution containers on Vercel are ephemeral and have a read-only filesystem.
+ * When Google Cloud Firestore is not configured or authenticated, investigations are kept
+ * in ephemeral in-memory storage (localCache) for the duration of the container's lifecycle.
+ * Filesystem caching is attempted as a local development convenience only; the application
+ * explicitly does NOT claim or assume that filesystem or in-memory fallback permanently
+ * preserves investigation history in production serverless environments.
+ */
 const localCache = new Map<string, InvestigationRecord>();
 const cacheFilePath = path.join(process.cwd(), 'data', 'investigations-cache.json');
 
-// Preload local cache from file if it exists
+// Preload local cache from file if it exists (local development only)
 function loadLocalCache() {
   if (localCache.size > 0) return;
   try {
@@ -45,7 +55,7 @@ function loadLocalCache() {
       }
     }
   } catch {
-    // Ignore cache read failures
+    // Ignore cache read failures in read-only / serverless environments
   }
 }
 
@@ -57,13 +67,21 @@ function persistLocalCache() {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(cacheFilePath, JSON.stringify(records, null, 2), 'utf-8');
-  } catch (err) {
-    console.warn('[InvestigationStore] Local cache persistence warning:', err);
+  } catch {
+    // On serverless platforms like Vercel, the root filesystem is read-only.
+    // Silently retain in-memory fallback without throwing errors or interrupting investigations.
   }
 }
 
 /**
- * Stores an investigation record to Firestore (/investigations) with graceful development fallback.
+ * Stores an investigation record to Firestore (/investigations) if available,
+ * or safely retains it in ephemeral in-memory cache if Firestore is unconfigured.
+ *
+ * STORAGE GUARANTEE:
+ * - 'firestore': Durable cloud storage across server restarts and serverless instances.
+ * - 'local_fallback': Ephemeral in-memory storage (tied to current node process / serverless container lifecycle).
+ *   On Vercel, this does not persist across container termination. Investigations remain fully usable
+ *   and render in the UI without throwing errors.
  */
 export async function saveInvestigation(record: InvestigationRecord): Promise<{
   success: boolean;

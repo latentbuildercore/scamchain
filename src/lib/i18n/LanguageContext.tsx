@@ -26,41 +26,39 @@ const STORAGE_KEY_AUTODETECT = 'scamchain_autodetect_enabled';
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // Synchronous client initialization prevents flash of English on page reloads
-  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
-    if (typeof window !== 'undefined') {
+  // Deterministic hydration-safe defaults identical on server and initial client render
+  const [locale, setLocaleState] = useState<SupportedLocale>(DEFAULT_LOCALE);
+  const [isAutoDetectEnabled, setAutoDetectEnabledState] = useState<boolean>(true);
+
+  // Restore persisted language preference or browser locale after initial hydration
+  useEffect(() => {
+    const timer = setTimeout(() => {
       try {
         const savedLocale = localStorage.getItem(STORAGE_KEY_LOCALE) as SupportedLocale | null;
-        if (savedLocale && savedLocale in SUPPORTED_LOCALES) {
-          return savedLocale;
-        }
-        if (typeof navigator !== 'undefined' && navigator.language) {
-          const browserLang = navigator.language.slice(0, 2).toLowerCase();
-          if (browserLang === 'hi') return 'hi';
-          if (browserLang === 'kn') return 'kn';
-          if (browserLang === 'ta') return 'ta';
-          if (browserLang === 'te') return 'te';
-        }
-      } catch {
-        // Fallback to default
-      }
-    }
-    return DEFAULT_LOCALE;
-  });
-
-  const [isAutoDetectEnabled, setAutoDetectEnabledState] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      try {
         const savedAuto = localStorage.getItem(STORAGE_KEY_AUTODETECT);
+
+        let isAuto = true;
         if (savedAuto !== null) {
-          return savedAuto === 'true';
+          isAuto = savedAuto === 'true';
+          setAutoDetectEnabledState(isAuto);
+        }
+
+        if (savedLocale && savedLocale in SUPPORTED_LOCALES) {
+          setLocaleState(savedLocale);
+        } else if (isAuto && typeof navigator !== 'undefined' && navigator.language) {
+          const browserLang = navigator.language.slice(0, 2).toLowerCase();
+          if (browserLang === 'hi') setLocaleState('hi');
+          else if (browserLang === 'kn') setLocaleState('kn');
+          else if (browserLang === 'ta') setLocaleState('ta');
+          else if (browserLang === 'te') setLocaleState('te');
         }
       } catch {
-        // Fallback to default
+        // Fallback to default in restricted or private browsing modes
       }
-    }
-    return true;
-  });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Keep HTML lang and dir attributes synchronized
   useEffect(() => {

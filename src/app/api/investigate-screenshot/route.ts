@@ -9,7 +9,7 @@ import { saveInvestigation } from '@/lib/data/investigation-store';
 import { InvestigationRecord, MessageInvestigationRecord } from '@/types';
 
 const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB (keeps within Vercel's 4.5 MB body limit)
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,12 +36,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Validate file size (max 5 MB)
+    // 2. Validate file size (max 3 MB)
     if (imageFile.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         {
           success: false,
-          error: `Image file is too large (${(imageFile.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 5 MB.`,
+          error: `Image file is too large (${(imageFile.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 3 MB.`,
         },
         { status: 400 }
       );

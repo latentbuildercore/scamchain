@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Suspense } from 'react';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,12 +23,6 @@ export const metadata: Metadata = {
   },
 };
 
-function NavbarPlaceholder() {
-  return (
-    <header className="sticky top-0 z-50 w-full h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md" />
-  );
-}
-
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
 
 export default function RootLayout({
@@ -44,9 +37,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <LanguageProvider>
-          <Suspense fallback={<NavbarPlaceholder />}>
-            <Navbar />
-          </Suspense>
+          <Navbar />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
         </LanguageProvider>
